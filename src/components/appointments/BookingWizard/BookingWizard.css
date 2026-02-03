@@ -1,0 +1,11 @@
+.booking-wizard {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.doctor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}

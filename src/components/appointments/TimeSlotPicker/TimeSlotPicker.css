@@ -1,0 +1,32 @@
+.time-slot-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.time-slot {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.time-slot:hover:not(.disabled) {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.time-slot.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.time-slot.disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}

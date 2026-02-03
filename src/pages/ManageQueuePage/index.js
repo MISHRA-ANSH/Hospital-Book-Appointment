@@ -1,0 +1,1 @@
+export { ManageQueuePage } from './ManageQueuePage';

@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { HospitalProvider } from './context/HospitalProvider';
 import { AppRoutes } from './routes';
+import { UserProfile } from './components/common/UserProfile';
+import { isAuthenticated } from './services/authService';
 import './App.css';
 
 function App() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        setIsLoggedIn(isAuthenticated());
+    }, []);
+
+    // Listen for storage changes to update login state
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setIsLoggedIn(isAuthenticated());
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also check periodically in case of same-tab changes
+        const interval = setInterval(handleStorageChange, 1000);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            clearInterval(interval);
+        };
+    }, []);
+
     return (
         <HospitalProvider>
             <div className="app">
@@ -23,10 +48,16 @@ function App() {
                     </div>
 
                     <div className="nav-actions">
-                        <button className="btn-login">Login</button>
-                        <button className="btn-book" onClick={() => window.location.href = '/book'}>
-                            Book Appointment
-                        </button>
+                        {isLoggedIn ? (
+                            <UserProfile />
+                        ) : (
+                            <>
+                                <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
+                                <button className="btn-book" onClick={() => window.location.href = '/signup'}>
+                                    Sign Up
+                                </button>
+                            </>
+                        )}
                     </div>
                 </nav>
 

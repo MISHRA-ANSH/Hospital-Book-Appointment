@@ -438,10 +438,10 @@ export const HomePage = () => {
 
                 <motion.div className="team-grid" variants={staggerContainer}>
                     {[
-                        { name: "Dr. Nazrul Islam", role: "Cardiologist", avatar: "NZ", class: "purple" },
-                        { name: "Dr. Masud Rana", role: "Neurologist", avatar: null },
-                        { name: "Dr. Joshna Akter", role: "Pediatrician", avatar: null },
-                        { name: "Dr. Kabir Hasan", role: "Surgeon", avatar: null }
+                        { name: "Dr. Prem Yadav", role: "Cardiologist", avatar: "PY", class: "purple" },
+                        { name: "Dr. Anay Gupta", role: "Neurologist", avatar: null },
+                        { name: "Dr. Anamika Singh", role: "Pediatrician", avatar: null },
+                        { name: "Dr. Siddhi Shukla", role: "Surgeon", avatar: null }
                     ].map((member, index) => (
                         <motion.div
                             key={index}
@@ -479,8 +479,8 @@ export const HomePage = () => {
 
                 <motion.div className="testimonials-grid" variants={staggerContainer}>
                     {[
-                        { name: "Nancy", role: "Patient", text: "The care I received was exceptional. The doctors were attentive, professional, and made me feel comfortable throughout my treatment. Highly recommend this hospital!", color: "fecaca" },
-                        { name: "John Smith", role: "Patient", text: "Outstanding medical facility with state-of-the-art equipment. The staff is friendly and the doctors are highly skilled. I'm grateful for the excellent care I received.", color: "bfdbfe" }
+                        { name: "Nancy Gaur", role: "Patient", text: "The care I received was exceptional. The doctors were attentive, professional, and made me feel comfortable throughout my treatment. Highly recommend this hospital!", color: "fecaca" },
+                        { name: "Sahil Rathi", role: "Patient", text: "Outstanding medical facility with state-of-the-art equipment. The staff is friendly and the doctors are highly skilled. I'm grateful for the excellent care I received.", color: "bfdbfe" }
                     ].map((testimonial, index) => (
                         <motion.div
                             key={index}
@@ -502,7 +502,6 @@ export const HomePage = () => {
                 </motion.div>
             </motion.div>
 
-            {/* Footer */}
             <motion.footer
                 className="footer"
                 initial={{ opacity: 0 }}
@@ -567,7 +566,7 @@ export const HomePage = () => {
                 </div>
 
                 <div className="footer-bottom">
-                    <p>Copyright © 2026 All Rights Reserved by HMS</p>
+                    <p>Copyright © 2026 All Rights Reserved by Epic Web</p>
                 </div>
             </motion.footer>
         </div>

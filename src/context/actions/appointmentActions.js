@@ -1,5 +1,5 @@
 import { APPOINTMENT_ACTIONS } from '../reducers/appointmentsReducer';
-import { createAppointment } from '../../services/appointmentService';
+import { bookAppointment as bookAppointmentService } from '../../services/appointmentService';
 import { validateBooking, validateCancellation, validateReschedule } from '../../services/validationService';
 
 export const bookAppointment = (dispatch, patientId, doctorId, date, time, timeEnd, appointments, doctor) => {
@@ -9,7 +9,14 @@ export const bookAppointment = (dispatch, patientId, doctorId, date, time, timeE
         throw new Error(validation.errors.join(', '));
     }
 
-    const appointment = createAppointment(patientId, doctorId, date, time, timeEnd);
+    // Note: This uses the old signature, may need updating to match new service
+    const appointment = bookAppointmentService({
+        patientId,
+        doctorId,
+        date,
+        time,
+        timeEnd
+    });
     dispatch({ type: APPOINTMENT_ACTIONS.BOOK_APPOINTMENT, payload: appointment });
 
     return appointment;

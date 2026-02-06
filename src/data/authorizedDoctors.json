@@ -1,0 +1,76 @@
+{
+    "doctors": [
+        {
+            "id": "DOC001",
+            "email": "dr.anamika@hospital.com",
+            "password": "anamika123",
+            "firstName": "Anamika",
+            "lastName": "Singh",
+            "specialty": "Cardiologist",
+            "department": "Cardiology",
+            "phone": "+91 98765 43210",
+            "experience": "15 Years",
+            "isActive": true
+        },
+        {
+            "id": "DOC002",
+            "email": "dr.harsh@hospital.com",
+            "password": "harsh123",
+            "firstName": "Harsh",
+            "lastName": "Mehta",
+            "specialty": "Endocrinologist",
+            "department": "Endocrinology",
+            "phone": "+91 98765 43211",
+            "experience": "12 Years",
+            "isActive": true
+        },
+        {
+            "id": "DOC003",
+            "email": "dr.prem@hospital.com",
+            "password": "prem123",
+            "firstName": "Prem",
+            "lastName": "Yadav",
+            "specialty": "Pediatrician",
+            "department": "Pediatrics",
+            "phone": "+91 98765 43212",
+            "experience": "10 Years",
+            "isActive": true
+        },
+        {
+            "id": "DOC004",
+            "email": "dr.meenakshi@hospital.com",
+            "password": "meenakshi123",
+            "firstName": "Meenakshi",
+            "lastName": "Patel",
+            "specialty": "Neurologist",
+            "department": "Neurology",
+            "phone": "+91 98765 43213",
+            "experience": "8 Years",
+            "isActive": true
+        },
+        {
+            "id": "DOC005",
+            "email": "dr.mukul@hospital.com",
+            "password": "mukul123",
+            "firstName": "Mukul",
+            "lastName": "Tyagi",
+            "specialty": "Surgeon",
+            "department": "Surgery",
+            "phone": "+91 98765 43214",
+            "experience": "11 Years",
+            "isActive": true
+        },
+        {
+            "id": "DOC006",
+            "email": "dr.rossy@hospital.com",
+            "password": "rossy123",
+            "firstName": "Rossy",
+            "lastName": "Kumar",
+            "specialty": "General Physician",
+            "department": "General Medicine",
+            "phone": "+91 98765 43215",
+            "experience": "7 Years",
+            "isActive": true
+        }
+    ]
+}

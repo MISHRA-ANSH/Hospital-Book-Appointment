@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
+import authorizedDoctorsData from '../../data/authorizedDoctors.json';
 
 export const LoginPage = () => {
     const navigate = useNavigate();
@@ -52,7 +53,44 @@ export const LoginPage = () => {
             return;
         }
 
-        // Get users from localStorage
+        // Special handling for doctor login
+        if (formData.role === 'doctor') {
+            // Check if doctor is authorized
+            const authorizedDoctor = authorizedDoctorsData.doctors.find(doc =>
+                doc.email.toLowerCase() === formData.email.toLowerCase() &&
+                doc.password === formData.password &&
+                doc.isActive
+            );
+
+            if (authorizedDoctor) {
+                // Store current doctor session with full details
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: authorizedDoctor.id,
+                    email: authorizedDoctor.email,
+                    firstName: authorizedDoctor.firstName,
+                    lastName: authorizedDoctor.lastName,
+                    phone: authorizedDoctor.phone,
+                    specialty: authorizedDoctor.specialty,
+                    department: authorizedDoctor.department,
+                    experience: authorizedDoctor.experience,
+                    role: 'doctor'
+                }));
+
+                // Show success message
+                alert(`Welcome back, Dr. ${authorizedDoctor.firstName}!`);
+
+                // Redirect to doctor dashboard
+                navigate('/doctor-dashboard');
+            } else {
+                // Doctor not authorized
+                setErrors({
+                    submit: 'Invalid details. Contact admin.'
+                });
+            }
+            return;
+        }
+
+        // For patient and admin roles, check localStorage
         const users = JSON.parse(localStorage.getItem('hospitalUsers') || '[]');
 
         // Find user with matching email, password, and role
@@ -77,8 +115,14 @@ export const LoginPage = () => {
             // Show success message
             alert(`Welcome back, ${user.firstName}!`);
 
-            // Redirect to home
-            navigate('/');
+            // Redirect based on role
+            if (user.role === 'patient') {
+                navigate('/patient-dashboard');
+            } else if (user.role === 'admin') {
+                navigate('/'); // Will create admin dashboard later
+            } else {
+                navigate('/');
+            }
         } else {
             setErrors({
                 submit: 'Invalid email, password, or role selection'

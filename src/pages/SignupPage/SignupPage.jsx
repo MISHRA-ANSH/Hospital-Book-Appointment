@@ -121,8 +121,16 @@ export const SignupPage = () => {
         // Show success message
         alert(`Registration successful! Welcome, ${newUser.firstName}!`);
 
-        // Redirect to home
-        navigate('/');
+        // Redirect based on role
+        if (newUser.role === 'patient') {
+            navigate('/patient-dashboard');
+        } else if (newUser.role === 'doctor') {
+            navigate('/doctor-dashboard');
+        } else if (newUser.role === 'admin') {
+            navigate('/');
+        } else {
+            navigate('/');
+        }
     };
 
     return (

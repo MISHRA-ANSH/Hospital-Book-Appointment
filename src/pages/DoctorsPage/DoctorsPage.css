@@ -1,0 +1,243 @@
+@import '../AppointmentsPage/AppointmentsPage.css';
+
+.doctors-page {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+/* Hero Section */
+.doctors-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 80px 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.hero-content h1 {
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+
+.breadcrumb {
+    display: flex;
+    gap: 10px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.breadcrumb a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.breadcrumb a:hover {
+    opacity: 0.8;
+}
+
+.hero-icon {
+    font-size: 120px;
+    opacity: 0.9;
+}
+
+/* Content Section */
+.doctors-content {
+    max-width: 1400px;
+    margin: -40px auto 80px;
+    padding: 0 40px;
+}
+
+.doctors-header {
+    text-align: center;
+    margin-bottom: 60px;
+    background: white;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.doctors-header h2 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 15px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #64748b;
+}
+
+/* Doctors Grid */
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.doctor-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+}
+
+.doctor-card:hover {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.doctor-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background: white;
+}
+
+.doctor-image {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 60px auto 40px;
+    display: block;
+    background: white;
+    border: 5px solid white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.badge-icon {
+    font-size: 14px;
+}
+
+.doctor-info {
+    padding: 30px;
+    text-align: center;
+}
+
+.doctor-info h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.specialty {
+    font-size: 16px;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.doctor-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    border-top: 2px solid #f1f5f9;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-icon {
+    font-size: 20px;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.book-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s;
+}
+
+.book-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .doctors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .doctors-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 60px 20px 40px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-icon {
+        font-size: 80px;
+    }
+
+    .doctors-content {
+        padding: 0 20px;
+    }
+
+    .doctors-header {
+        padding: 30px 20px;
+    }
+
+    .doctors-header h2 {
+        font-size: 28px;
+    }
+
+    .doctors-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .doctor-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .doctor-image-wrapper {
+        height: 250px;
+    }
+}

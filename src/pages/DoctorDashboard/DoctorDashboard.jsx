@@ -235,7 +235,6 @@ export const DoctorDashboard = () => {
                     </div>
                 </motion.div>
 
-                {/* Dynamic Content Sections */}
                 <DoctorSections
                     activeSection={activeSection}
                     currentUser={currentUser}

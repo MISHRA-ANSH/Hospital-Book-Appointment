@@ -41,9 +41,6 @@ export const DashboardSections = ({ activeSection, currentUser, stats, recentApp
             case 'discharge':
                 return <DischargeSummary />;
 
-            case 'current-medicines':
-                return <CurrentMedicines />;
-
             case 'refill':
                 return <RefillRequest />;
 

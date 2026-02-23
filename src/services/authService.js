@@ -103,6 +103,10 @@ export const loginUser = (email, password, role = 'patient') => {
 export const logoutUser = () => {
     try {
         localStorage.removeItem(CURRENT_USER_KEY);
+        // Force reload to clear any cached state
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
         return {
             success: true,
             message: 'Logout successful'

@@ -1,17 +1,200 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HospitalContext } from '../../context/HospitalContext';
 import { Card } from '../../components/common/UI/Card';
 import { formatDate } from '../../utils/dateUtils';
+import { getCurrentUser, registerUser, loginUser } from '../../services/authService';
+import { getAvailableSlots, initializeSlotsForDoctors } from '../../services/timeSlotService';
+import { bookAppointment } from '../../services/appointmentService';
+import authorizedDoctorsData from '../../data/authorizedDoctors.json';
 import './HomePage.css';
 
 export const HomePage = () => {
     const { appointments, doctors, patients, queue } = useContext(HospitalContext);
+    const [selectedDoctor, setSelectedDoctor] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [selectedSlot, setSelectedSlot] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [patientDetails, setPatientDetails] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        password: '',
+        gender: 'male'
+    });
+    const currentUser = getCurrentUser();
+
+    const authorizedDoctors = authorizedDoctorsData.doctors;
 
     const today = formatDate(new Date());
     const todayAppointments = appointments.filter(apt => apt.date === today);
     const activeQueue = queue.filter(q => q.status !== 'COMPLETED' && q.status !== 'CANCELLED');
     const availableDoctors = doctors.filter(d => d.isAvailable);
+
+    // Initialize slots for all doctors on component mount
+    useEffect(() => {
+        initializeSlotsForDoctors(authorizedDoctors);
+    }, []);
+
+    // Handle doctor selection - check if user is logged in
+    const handleDoctorChange = (e) => {
+        const doctorId = e.target.value;
+        setSelectedDoctor(doctorId);
+    };
+
+    // Load available slots when doctor and date are selected
+    useEffect(() => {
+        if (selectedDoctor && selectedDate) {
+            setLoading(true);
+            try {
+                const slots = getAvailableSlots(selectedDoctor, selectedDate);
+                setAvailableSlots(slots);
+                setSelectedSlot(null);
+            } catch (error) {
+                setMessage({ type: 'error', text: 'Error loading slots' });
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            setAvailableSlots([]);
+            setSelectedSlot(null);
+        }
+    }, [selectedDoctor, selectedDate]);
+
+    const handleBookAppointment = async (e) => {
+        e.preventDefault();
+
+        // Check if user is logged in
+        if (!currentUser) {
+            // Show login modal instead of redirecting
+            setShowLoginModal(true);
+            return;
+        }
+
+        // Check if user is a patient
+        if (currentUser.role !== 'patient') {
+            setMessage({ type: 'error', text: 'Only patients can book appointments' });
+            return;
+        }
+
+        if (!selectedSlot) {
+            setMessage({ type: 'error', text: 'Please select a time slot' });
+            return;
+        }
+
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            const doctor = authorizedDoctors.find(d => d.id === selectedDoctor);
+
+            const appointment = bookAppointment({
+                patientId: currentUser.id,
+                patientName: `${currentUser.firstName} ${currentUser.lastName}`,
+                patientEmail: currentUser.email,
+                doctorId: doctor.id,
+                doctorName: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+                doctorEmail: doctor.email,
+                department: doctor.department,
+                slotId: selectedSlot.id
+            });
+
+            setMessage({
+                type: 'success',
+                text: `Appointment request sent successfully! Queue number: #${appointment.queueNumber}. Waiting for doctor approval.`
+            });
+
+            // Reset form
+            setTimeout(() => {
+                setSelectedDoctor('');
+                setSelectedDate('');
+                setAvailableSlots([]);
+                setSelectedSlot(null);
+                setMessage({ type: '', text: '' });
+            }, 3000);
+
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle patient registration and booking from modal
+    const handleModalSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            // Register the patient
+            const registerResult = registerUser({
+                ...patientDetails,
+                role: 'patient'
+            });
+
+            if (!registerResult.success) {
+                setMessage({ type: 'error', text: registerResult.message });
+                setLoading(false);
+                return;
+            }
+
+            // Login the patient
+            const loginResult = loginUser(patientDetails.email, patientDetails.password, 'patient');
+
+            if (!loginResult.success) {
+                setMessage({ type: 'error', text: 'Registration successful but login failed. Please login manually.' });
+                setLoading(false);
+                return;
+            }
+
+            // Book the appointment
+            const doctor = authorizedDoctors.find(d => d.id === selectedDoctor);
+            const appointment = bookAppointment({
+                patientId: loginResult.user.id,
+                patientName: `${loginResult.user.firstName} ${loginResult.user.lastName}`,
+                patientEmail: loginResult.user.email,
+                doctorId: doctor.id,
+                doctorName: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+                doctorEmail: doctor.email,
+                department: doctor.department,
+                slotId: selectedSlot.id
+            });
+
+            setMessage({
+                type: 'success',
+                text: `Account created and appointment booked! Queue number: #${appointment.queueNumber}`
+            });
+
+            setShowLoginModal(false);
+
+            // Reload page to update user session
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Get minimum date (today)
+    const getMinDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    // Get maximum date (30 days from now)
+    const getMaxDate = () => {
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 30);
+        return maxDate.toISOString().split('T')[0];
+    };
 
     const fadeInUp = {
         initial: { opacity: 0, y: 60 },
@@ -107,7 +290,6 @@ export const HomePage = () => {
                 </motion.div>
             </motion.div>
 
-            {/* Booking Bar */}
             <motion.div
                 className="booking-bar-section"
                 initial={{ opacity: 0, y: 50 }}
@@ -119,25 +301,88 @@ export const HomePage = () => {
                     whileHover={{ boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)" }}
                 >
                     <h2 className="booking-title">Book an Appointment</h2>
-                    <div className="booking-form">
-                        <select className="booking-select">
-                            <option>Select Doctor</option>
-                            {doctors.map(doctor => (
+
+                    {message.text && (
+                        <div className={`alert alert-${message.type}`} style={{
+                            padding: '1rem',
+                            marginBottom: '1rem',
+                            borderRadius: '8px',
+                            backgroundColor: message.type === 'success' ? '#d1fae5' : '#fee2e2',
+                            color: message.type === 'success' ? '#065f46' : '#991b1b',
+                            textAlign: 'center'
+                        }}>
+                            {message.text}
+                        </div>
+                    )}
+
+                    <form className="booking-form" onSubmit={handleBookAppointment}>
+                        <select
+                            className="booking-select"
+                            value={selectedDoctor}
+                            onChange={handleDoctorChange}
+                            required
+                        >
+                            <option value="">Select Doctor</option>
+                            {authorizedDoctors.map(doctor => (
                                 <option key={doctor.id} value={doctor.id}>
-                                    Dr. {doctor.firstName} {doctor.lastName} - {doctor.specialization}
+                                    Dr. {doctor.firstName} {doctor.lastName} - {doctor.specialty}
                                 </option>
                             ))}
                         </select>
-                        <input type="date" className="booking-date" placeholder="Select Date" />
+
+                        <input
+                            type="date"
+                            className="booking-date"
+                            placeholder="Select Date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            min={getMinDate()}
+                            max={getMaxDate()}
+                            required
+                        />
+                        {selectedDoctor && selectedDate && (
+                            <select
+                                className="booking-select"
+                                value={selectedSlot?.id || ''}
+                                onChange={(e) => {
+                                    const slot = availableSlots.find(s => s.id === e.target.value);
+                                    setSelectedSlot(slot);
+                                }}
+                                required
+                            >
+                                <option value="">Select Time Slot</option>
+                                {loading ? (
+                                    <option disabled>Loading slots...</option>
+                                ) : availableSlots.length > 0 ? (
+                                    availableSlots.map(slot => (
+                                        <option
+                                            key={slot.id}
+                                            value={slot.id}
+                                            disabled={!slot.isAvailable}
+                                        >
+                                            🕐 {slot.time} {!slot.isAvailable ? '(Booked)' : ''}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>No slots available</option>
+                                )}
+                            </select>
+                        )}
+
                         <motion.button
+                            type="submit"
                             className="booking-btn"
-                            onClick={() => window.location.href = '/book'}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            disabled={loading || !selectedSlot}
+                            whileHover={{ scale: loading || !selectedSlot ? 1 : 1.05 }}
+                            whileTap={{ scale: loading || !selectedSlot ? 1 : 0.95 }}
+                            style={{
+                                opacity: loading || !selectedSlot ? 0.6 : 1,
+                                cursor: loading || !selectedSlot ? 'not-allowed' : 'pointer'
+                            }}
                         >
-                            Book Now
+                            {loading ? 'Booking...' : 'Book Now'}
                         </motion.button>
-                    </div>
+                    </form>
                 </motion.div>
             </motion.div>
 
@@ -330,7 +575,6 @@ export const HomePage = () => {
                 </motion.div>
             </motion.div>
 
-            {/* Services Section */}
             <motion.div
                 className="services-section"
                 initial="initial"
@@ -569,6 +813,124 @@ export const HomePage = () => {
                     <p>Copyright © 2026 All Rights Reserved by Epic Web</p>
                 </div>
             </motion.footer>
+
+            {/* Patient Details Modal */}
+            {showLoginModal && (
+                <motion.div
+                    className="modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setShowLoginModal(false)}
+                >
+                    <motion.div
+                        className="modal-content"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-header">
+                            <h2>📋 Patient Details</h2>
+                            <button className="modal-close" onClick={() => setShowLoginModal(false)}>✕</button>
+                        </div>
+
+                        <form className="modal-form" onSubmit={handleModalSubmit}>
+                            <div className="form-row-modal">
+                                <div className="form-field-modal">
+                                    <label>First Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={patientDetails.firstName}
+                                        onChange={(e) => setPatientDetails({ ...patientDetails, firstName: e.target.value })}
+                                        placeholder="Enter first name"
+                                    />
+                                </div>
+                                <div className="form-field-modal">
+                                    <label>Last Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={patientDetails.lastName}
+                                        onChange={(e) => setPatientDetails({ ...patientDetails, lastName: e.target.value })}
+                                        placeholder="Enter last name"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-field-modal">
+                                <label>Email *</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={patientDetails.email}
+                                    onChange={(e) => setPatientDetails({ ...patientDetails, email: e.target.value })}
+                                    placeholder="Enter email address"
+                                />
+                            </div>
+
+                            <div className="form-field-modal">
+                                <label>Phone Number *</label>
+                                <input
+                                    type="tel"
+                                    required
+                                    value={patientDetails.phone}
+                                    onChange={(e) => setPatientDetails({ ...patientDetails, phone: e.target.value })}
+                                    placeholder="Enter phone number"
+                                />
+                            </div>
+
+                            <div className="form-field-modal">
+                                <label>Password *</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={patientDetails.password}
+                                    onChange={(e) => setPatientDetails({ ...patientDetails, password: e.target.value })}
+                                    placeholder="Create a password"
+                                    minLength="6"
+                                />
+                            </div>
+
+                            <div className="form-field-modal">
+                                <label>Gender *</label>
+                                <select
+                                    required
+                                    value={patientDetails.gender}
+                                    onChange={(e) => setPatientDetails({ ...patientDetails, gender: e.target.value })}
+                                >
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            {message.text && (
+                                <div className={`alert alert-${message.type}`} style={{
+                                    padding: '0.75rem',
+                                    marginTop: '1rem',
+                                    borderRadius: '8px',
+                                    backgroundColor: message.type === 'success' ? '#d1fae5' : '#fee2e2',
+                                    color: message.type === 'success' ? '#065f46' : '#991b1b',
+                                    textAlign: 'center',
+                                    fontSize: '14px'
+                                }}>
+                                    {message.text}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="modal-submit-btn"
+                                disabled={loading}
+                            >
+                                {loading ? 'Booking...' : 'Register & Book Appointment'}
+                            </button>
+                        </form>
+                    </motion.div>
+                </motion.div>
+            )}
         </div>
     );
 };

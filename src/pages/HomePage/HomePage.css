@@ -209,9 +209,6 @@
     border-radius: var(--radius-xl);
     padding: clamp(30px, 5vw, 40px) clamp(25px, 5vw, 45px);
     box-shadow: var(--shadow-lg);
-    display: flex;
-    align-items: center;
-    gap: clamp(20px, 4vw, 35px);
     border: 1px solid var(--bg-border);
 }
 
@@ -219,15 +216,15 @@
     font-size: clamp(20px, 3vw, 26px);
     font-weight: 800;
     color: var(--text-dark);
-    white-space: nowrap;
-    margin: 0;
+    margin: 0 0 20px 0;
+    text-align: center;
 }
 
 .booking-form {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 18px;
-    flex: 1;
-    align-items: center;
+    align-items: end;
 }
 
 .booking-select,
@@ -241,6 +238,7 @@
     background: var(--bg-light);
     cursor: pointer;
     transition: var(--transition-base);
+    width: 100%;
 }
 
 .booking-select:focus,
@@ -249,6 +247,12 @@
     border-color: var(--primary-blue);
     background: var(--bg-white);
     box-shadow: 0 0 0 3px var(--primary-blue-bg);
+}
+
+.booking-select option:disabled {
+    color: #94a3b8;
+    background: #f1f5f9;
+    font-style: italic;
 }
 
 .booking-btn {
@@ -260,12 +264,23 @@
     cursor: pointer;
     font-weight: 700;
     font-size: 16px;
-    white-space: nowrap;
     box-shadow: var(--shadow-md);
     transition: var(--transition-base);
+    white-space: nowrap;
+    width: 100%;
 }
 
-.booking-btn:hover {
+.booking-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.booking-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ========================================
     transform: translateY(-2px) scale(1.05);
     box-shadow: var(--shadow-lg);
 }
@@ -978,5 +993,147 @@
 
     .testimonials-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+
+/* ========================================
+   PATIENT DETAILS MODAL
+   ======================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.modal-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.modal-close:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row-modal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-field-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-field-modal label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.form-field-modal input,
+.form-field-modal select {
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.form-field-modal input:focus,
+.form-field-modal select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.modal-submit-btn {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+    color: white;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.modal-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+}
+
+.modal-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 30px 20px;
+    }
+
+    .form-row-modal {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-header h2 {
+        font-size: 24px;
     }
 }

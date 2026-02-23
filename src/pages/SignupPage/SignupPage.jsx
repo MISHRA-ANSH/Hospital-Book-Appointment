@@ -25,7 +25,7 @@ export const SignupPage = () => {
             ...prev,
             [name]: value
         }));
-        // Clear error when user starts typing
+
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -236,7 +236,7 @@ export const SignupPage = () => {
                         <div className="form-group">
                             <label htmlFor="firstName">
                                 First Name <span className="required">*</span>
-                            </label>
+                            </label> 
                             <motion.input
                                 type="text"
                                 id="firstName"
@@ -395,7 +395,7 @@ export const SignupPage = () => {
                                 </button>
                             </div>
                             {errors.confirmPassword && (
-                                <motion.span
+                                <motion.span     
                                     className="error-message"
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}

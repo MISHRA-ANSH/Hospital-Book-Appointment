@@ -8,8 +8,29 @@ export const UserProfile = () => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
-        const currentUser = getCurrentUser();
-        setUser(currentUser);
+        const loadUser = () => {
+            const currentUser = getCurrentUser();
+            setUser(currentUser);
+        };
+
+        loadUser();
+
+        // Listen for storage changes (when user logs in/out in another tab)
+        const handleStorageChange = (e) => {
+            if (e.key === 'currentUser') {
+                loadUser();
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also check periodically for session changes
+        const interval = setInterval(loadUser, 2000);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            clearInterval(interval);
+        };
     }, []);
 
     const handleLogout = () => {
@@ -34,10 +55,10 @@ export const UserProfile = () => {
                 whileTap={{ scale: 0.95 }}
             >
                 <div className="user-avatar">
-                    {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                    {user.firstName?.charAt(0) || 'U'}{user.lastName?.charAt(0) || 'U'}
                 </div>
                 <div className="user-info-inline">
-                    <span className="user-name">{user.firstName}</span>
+                    <span className="user-name">{user.firstName} {user.lastName}</span>
                     <span className="user-role-badge">{user.role}</span>
                 </div>
                 <span className="dropdown-arrow">▾</span>
